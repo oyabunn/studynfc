@@ -20,7 +20,7 @@ public class MainActivity extends Activity {
 		byte[] tagid = intent.getByteArrayExtra(NfcAdapter.EXTRA_ID);
         Tag tag = (Tag)intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
         
-        int sector = 0;
+        int sector = 1;
         if(tag!=null)
         {
         	Log.i("nfc","nfc tagid="+stringFromBytes(tagid));
@@ -28,7 +28,12 @@ public class MainActivity extends Activity {
             try {
                 if(!mfc.isConnected())mfc.connect();
                 if(mfc.authenticateSectorWithKeyA(sector,MifareClassic.KEY_DEFAULT)){
-                    byte[] Block0 = mfc.readBlock(0);
+                	byte[] data = new byte[16];
+                	data[0] = (byte)0x00;
+                	data[1] = (byte)0x10;
+                	data[2] = (byte)0xFF;
+                    mfc.writeBlock(sector*4+0,data);
+                    byte[] Block0 = mfc.readBlock(sector*4+0);
                     String Block0String = stringFromBytes(Block0);
                     Log.i("nfc","nfc Block0="+Block0String);
                 }else{
